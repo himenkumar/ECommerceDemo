@@ -20,10 +20,7 @@ namespace EcommerceDemo.WebApi.Controllers
 
         public IHttpActionResult Put(int id, [FromBody] ProductCategoryAttributeModel model)
             => Ok(_productCategoryAttributeService.Update(id, model));
-
-        public IHttpActionResult Post([FromBody] ProductCategoryAttributeModel model)
-            => Ok(_productCategoryAttributeService.Create(model));
-
+        
         public IHttpActionResult Delete(int id)
             => Ok(_productCategoryAttributeService.Delete(id));
     }
