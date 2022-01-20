@@ -1,0 +1,284 @@
+{
+	"variables": [],
+	"info": {
+		"name": "EcommerceDemo",
+		"_postman_id": "18775fd1-14fe-c5f3-ce9e-99f5c60f1f53",
+		"description": "",
+		"schema": "https://schema.getpostman.com/json/collection/v2.0.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Product Category Attribute",
+			"description": "",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"url": "{{host}}/product-category-attribute/8",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get By Product Category Id",
+					"request": {
+						"url": {
+							"raw": "{{host}}/product-category/:productCategoryId/attributes",
+							"host": [
+								"{{host}}"
+							],
+							"path": [
+								"product-category",
+								":productCategoryId",
+								"attributes"
+							],
+							"query": [],
+							"variable": [
+								{
+									"key": "productCategoryId",
+									"value": ""
+								}
+							]
+						},
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"url": "{{host}}/product-category-attribute/1",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"AttributeId\": 1,\n    \"ProductCategory\": {\n        \"CategoryId\": 1\n    },\n    \"AttributeName\": \"Color2\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"url": "{{host}}/product-category-attribute/8",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": "",
+								"disabled": true
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"url": "{{host}}/product-category-attributes",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ProductCategory\": {\n        \"CategoryId\": 1\n    },\n    \"AttributeName\": \"NoOfSeats\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Products",
+			"description": "",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"url": "{{host}}/product/6",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ProductName\": \"Suzuki Baleno\",\n    \"Category\": {\n        \"CategoryId\": 1,\n        \"CategoryName\": \"Car\"\n    },\n    \"Attributes\": [\n        {\n            \"AttributeId\": 1,\n            \"AttributeValue\": \"White\"\n        },\n        {\n            \"AttributeId\": 2,\n            \"AttributeValue\": \"2018\"\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"url": "{{host}}/product/5",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ProductName\": \"Suzuki Baleno\",\n    \"Category\": {\n        \"CategoryId\": 1,\n        \"CategoryName\": \"Car\"\n    },\n    \"Attributes\": [\n        {\n            \"AttributeId\": 1,\n            \"AttributeValue\": \"White\"\n        },\n        {\n            \"AttributeId\": 2,\n            \"AttributeValue\": \"2018\"\n        },\n        {\n            \"AttributeId\": 9,\n            \"AttributeValue\": \"5\"\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"url": "{{host}}/products",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ProductName\": \"Suzuki Baleno\",\n    \"Category\": {\n        \"CategoryId\": 1,\n        \"CategoryName\": \"Car\"\n    },\n    \"Attributes\": [\n        {\n            \"AttributeId\": 1,\n            \"AttributeValue\": \"White\"\n        },\n        {\n            \"AttributeId\": 2,\n            \"AttributeValue\": \"2018\"\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get All",
+					"request": {
+						"url": "{{host}}/products",
+						"method": "GET",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"ProductName\": \"Suzuki Baleno\",\n    \"Category\": {\n        \"CategoryId\": 1,\n        \"CategoryName\": \"Car\"\n    },\n    \"Attributes\": [\n        {\n            \"AttributeId\": 1,\n            \"AttributeValue\": \"White\"\n        },\n        {\n            \"AttributeId\": 2,\n            \"AttributeValue\": \"2018\"\n        }\n    ]\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"url": "{{host}}/product/5",
+						"method": "DELETE",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Product Category",
+			"description": "",
+			"item": [
+				{
+					"name": "Get All",
+					"request": {
+						"url": "{{host}}/product-categories",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Create",
+					"request": {
+						"url": "{{host}}/product-categories",
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"CategoryName\": \"Laptop\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Get",
+					"request": {
+						"url": "{{host}}/product-category/3",
+						"method": "GET",
+						"header": [],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Update",
+					"request": {
+						"url": "{{host}}/product-category/3",
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"CategoryName\": \"Laptop2\"\n}"
+						},
+						"description": ""
+					},
+					"response": []
+				},
+				{
+					"name": "Delete",
+					"request": {
+						"url": "{{host}}/product-category/3",
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json",
+								"description": ""
+							}
+						],
+						"body": {},
+						"description": ""
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
