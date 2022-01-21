@@ -2,6 +2,7 @@
 using EcommerceDemo.Api.ResourceModel.Exceptions;
 using EcommerceDemo.Core.DtoModel;
 using EcommerceDemo.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -11,8 +12,8 @@ namespace EcommerceDemo.Api.Services
     {
         IEnumerable<ProductCategoryModel> GetAll(int limit, int offset, string sortBy, string sortDir, string searchTerm);
         ProductCategoryModel Get(int id);
-        int Create(ProductCategoryModel productAttributeModel);
-        int Update(int id, ProductCategoryModel productAttributeModel);
+        int Create(ProductCategoryModel productCategoryModel);
+        int Update(int id, ProductCategoryModel productCategoryModel);
         bool Delete(int id);
     }
 
@@ -25,11 +26,13 @@ namespace EcommerceDemo.Api.Services
             _productCategoryAppServices = productCategoryAppServices;
         }
 
-        public int Create(ProductCategoryModel productAttributeModel)
+        public int Create(ProductCategoryModel productCategoryModel)
         {
+            ValidateRequestModel(productCategoryModel);
+
             try
             {
-                return _productCategoryAppServices.Create(MapToDto(productAttributeModel));
+                return _productCategoryAppServices.Create(MapToDto(productCategoryModel));
             }
             catch (InvalidServiceCallException ex)
             {
@@ -37,8 +40,20 @@ namespace EcommerceDemo.Api.Services
             }
         }
 
+        private void ValidateRequestModel(ProductCategoryModel productAttributeModel)
+        {
+            if (productAttributeModel == null)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "model can't be empty");
+
+            if (string.IsNullOrEmpty(productAttributeModel.CategoryName))
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "category name can't be empty");
+        }
+
         public bool Delete(int id)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotDeleteResource, "invalid product category id");
+
             try
             {
                 var result = _productCategoryAppServices.Get(id);
@@ -54,6 +69,9 @@ namespace EcommerceDemo.Api.Services
 
         public ProductCategoryModel Get(int id)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotGetResource, "invalid product category id");
+
             try
             {
                 var result = _productCategoryAppServices.Get(id);
@@ -80,15 +98,20 @@ namespace EcommerceDemo.Api.Services
             }
         }
 
-        public int Update(int id, ProductCategoryModel productAttributeModel)
+        public int Update(int id, ProductCategoryModel productCategoryModel)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotGetResource, "invalid product category id");
+
+            ValidateRequestModel(productCategoryModel);
+
             try
             {
                 var result = _productCategoryAppServices.Get(id);
                 if (result == null)
                     throw new NotFoundException();
 
-                return _productCategoryAppServices.Update(id, MapToDto(productAttributeModel));
+                return _productCategoryAppServices.Update(id, MapToDto(productCategoryModel));
             }
             catch (InvalidServiceCallException ex)
             {

@@ -2,6 +2,7 @@
 using EcommerceDemo.Api.ResourceModel.Exceptions;
 using EcommerceDemo.Core.DtoModel;
 using EcommerceDemo.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -40,6 +41,9 @@ namespace EcommerceDemo.Api.Services
 
         public ProductModel Get(long id)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotGetResource, "invalid product  id");
+
             try
             {
                 var result = _productAppServices.Get(id);
@@ -58,6 +62,8 @@ namespace EcommerceDemo.Api.Services
 
         public long Create(ProductModel model)
         {
+            ValidateRequestModel(model);
+
             try
             {
                 return _productAppServices.Create(MapToDto(model));                
@@ -68,8 +74,19 @@ namespace EcommerceDemo.Api.Services
             }
         }
 
+        private void ValidateRequestModel(ProductModel model)
+        {
+            if (model == null)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "model can't be empty");
+        }
+
         public long Update(long id, ProductModel model)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotUpdateResource, "invalid product id");
+
+            ValidateRequestModel(model);
+
             try
             {
                 var result = _productAppServices.Get(id);
@@ -87,6 +104,9 @@ namespace EcommerceDemo.Api.Services
 
         public bool Delete(long id)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotDeleteResource, "invalid product id");
+
             try
             {
                 var result = _productAppServices.Get(id);

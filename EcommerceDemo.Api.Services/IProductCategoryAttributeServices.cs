@@ -2,6 +2,7 @@
 using EcommerceDemo.Api.ResourceModel.Exceptions;
 using EcommerceDemo.Core.DtoModel;
 using EcommerceDemo.Core.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -27,6 +28,8 @@ namespace EcommerceDemo.Api.Services
         }
         public int Create(ProductCategoryAttributeModel productAttributeModel)
         {
+            ValidateRequestModel(productAttributeModel);            
+
             try
             {
                 return _productCategoryAttributeAppServices.Create(MapToDto(productAttributeModel));
@@ -37,8 +40,20 @@ namespace EcommerceDemo.Api.Services
             }
         }
 
+        private void ValidateRequestModel(ProductCategoryAttributeModel productAttributeModel)
+        {
+            if (productAttributeModel == null)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "model can't be empty");
+
+            if (productAttributeModel.ProductCategory == null || productAttributeModel.ProductCategory.CategoryId < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "invalid product category");
+        }
+
         public bool Delete(int id)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "invalid product category attribute id");
+
             try
             {
                 var result = _productCategoryAttributeAppServices.Get(id);
@@ -55,6 +70,9 @@ namespace EcommerceDemo.Api.Services
 
         public ProductCategoryAttributeModel Get(int id)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "invalid product category attribute id");
+
             try
             {
                 var result = _productCategoryAttributeAppServices.Get(id);
@@ -71,6 +89,9 @@ namespace EcommerceDemo.Api.Services
 
         public IEnumerable<ProductCategoryAttributeModel> GetByProductCategoryId(int productCategoryId)
         {
+            if (productCategoryId < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "invalid product category id");
+
             try
             {
                 var prodCategory = _productCategoryAppServices.Get(productCategoryId);
@@ -90,6 +111,11 @@ namespace EcommerceDemo.Api.Services
 
         public int Update(int id, ProductCategoryAttributeModel productAttributeModel)
         {
+            if (id < 1)
+                throw new BadRequestException(ApiErrorCode.CanNotCreateResource, "invalid product category attribute id");
+
+            ValidateRequestModel(productAttributeModel);
+
             try
             {
                 var result = _productCategoryAttributeAppServices.Get(id);
