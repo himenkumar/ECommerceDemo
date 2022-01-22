@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Transactions;
-
+    
 namespace EcommerceDemo.Core.Services
 {
     public interface IProductCategoryAppServices
@@ -50,28 +50,28 @@ namespace EcommerceDemo.Core.Services
             {
                 var productCategory = _uow.ProductCategoryRepository.GetByID(id);
 
-                if (productCategory != null)
+                if (productCategory == null)
                 {
-                    _uow.ProductCategoryRepository.Delete(productCategory);
-                    _uow.Save();
-                    scope.Complete();
-                    return true;
+                    throw new InvalidServiceCallException("product category does not exist");
                 }
-            }
 
-            return false;
+                _uow.ProductCategoryRepository.Delete(productCategory);
+                _uow.Save();
+                scope.Complete();
+                return true;
+            }
         }
 
         public ProductCategoryDto Get(int id)
         {
             var productCategory = _uow.ProductCategoryRepository.GetByID(id);
 
-            if (productCategory != null)
+            if (productCategory == null)
             {
-                return MapToDto(productCategory);
+                throw new InvalidServiceCallException("product category does not exist");
             }
 
-            return null;
+            return MapToDto(productCategory);
         }
 
         public IEnumerable<ProductCategoryDto> GetAll(int limit, int offset, string sortBy, string sortDir, string searchTerm)
@@ -84,14 +84,19 @@ namespace EcommerceDemo.Core.Services
             var productsCategoryies = _uow.ProductCategoryRepository.GetAll(whereClause, searchTerm, limit, offset, out int totalRecords, out int filteredRecords, sortDirection, sortByField).ToList();
 
             return productsCategoryies != null ? productsCategoryies.Select(x => MapToDto(x)) : new List<ProductCategoryDto>();
-        }        
+        }
 
         public int Update(int id, ProductCategoryDto productCategoryDto)
         {
             using (var scope = new TransactionScope())
             {
                 var productCategory = _uow.ProductCategoryRepository.GetByID(id);
-                
+
+                if (productCategory == null)
+                {
+                    throw new InvalidServiceCallException("product category does not exist");
+                }
+
                 productCategory.CategoryName = productCategoryDto.CategoryName;
 
                 _uow.ProductCategoryRepository.Update(productCategory);

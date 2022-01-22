@@ -1,4 +1,5 @@
-﻿using System.Web.Http;
+﻿using Newtonsoft.Json.Converters;
+using System.Web.Http;
 using System.Web.Http.Cors;
 
 namespace EcommerceDemo.WebApi
@@ -17,6 +18,9 @@ namespace EcommerceDemo.WebApi
                 routeTemplate: "api/{controller}/{id}",
                 defaults: new { id = RouteParameter.Optional }
             );
+
+            var jsonFormatter = config.Formatters.JsonFormatter;
+            jsonFormatter.SerializerSettings.Converters.Add(new StringEnumConverter());
 
             var cors = new EnableCorsAttribute("*", "*", "*");
             config.EnableCors(cors);

@@ -22,27 +22,33 @@ namespace EcommerceDemo.Core.Services
     public class ProductAppServices : IProductAppServices
     {
         private readonly IUnitOfWork _uow;
+        private readonly IProductCategoryAppServices _productCategoryAppServices;
+        private readonly IProductCategoryAttributeAppServices _productCategoryAttributeAppServices;
 
-        private IDictionary<string, string> sortByMapping = new Dictionary<string, string>()
+        private readonly IDictionary<string, string> sortByMapping = new Dictionary<string, string>()
         {
             { "product_id", "ProductId"},
             { "product_name", "ProdName"},
             { "product_description", "ProdDescription"}
         };
 
-        private IDictionary<string, string> sortDirMapping = new Dictionary<string, string>()
+        private readonly IDictionary<string, string> sortDirMapping = new Dictionary<string, string>()
         {
             { "Asc", "ascending"},
             { "Desc", "descending"}
         };
 
-        public ProductAppServices(IUnitOfWork uow)
+        public ProductAppServices(IUnitOfWork uow,
+            IProductCategoryAppServices productCategoryAppServices,
+            IProductCategoryAttributeAppServices productCategoryAttributeAppServices)
         {
             _uow = uow;
+            _productCategoryAppServices = productCategoryAppServices;
+            _productCategoryAttributeAppServices = productCategoryAttributeAppServices;
         }
 
         public IEnumerable<ProductDto> GetAll(int limit, int offset, string sortBy, string sortDir, string searchTerm)
-        {   
+        {
             if (!sortByMapping.TryGetValue(sortBy, out string sortByField))
             {
                 throw new InvalidServiceCallException("invalid sort by field");
@@ -55,14 +61,14 @@ namespace EcommerceDemo.Core.Services
 
             Expression<Func<Product, bool>> whereClause = BuildWhereClause(searchTerm);
 
-            var products2 = _uow.ProductRepository.GetAll(whereClause, searchTerm,limit,offset, out int totalRecords, out int filteredRecords, sortDirection, sortByField).ToList();
+            var products2 = _uow.ProductRepository.GetAll(whereClause, searchTerm, limit, offset, out int totalRecords, out int filteredRecords, sortDirection, sortByField).ToList();
 
-            return products2 != null ? products2.Select(x=> MapToDto(x)): new List<ProductDto>();
+            return products2 != null ? products2.Select(x => MapToDto(x)) : new List<ProductDto>();
         }
 
         private Expression<Func<Product, bool>> BuildWhereClause(string searchTerm)
-        {   
-            var predicate = PredicateBuilder.New<Product>(true); 
+        {
+            var predicate = PredicateBuilder.New<Product>(true);
 
             if (!string.IsNullOrWhiteSpace(searchTerm))
             {
@@ -78,15 +84,17 @@ namespace EcommerceDemo.Core.Services
         {
             var product = _uow.ProductRepository.GetByID(id);
 
-            return product != null ? MapToDto(product) : null;
+            if (product == null)
+            {
+                throw new InvalidServiceCallException("product does not exist");
+            }
+
+            return MapToDto(product);
         }
 
         public long Create(ProductDto productDto)
         {
-            if (productDto.Category == null)
-            {
-                throw new InvalidServiceCallException("Product category should be defined.");
-            }
+            ValidateProductDto(productDto);
 
             using (var scope = new TransactionScope())
             {
@@ -109,16 +117,42 @@ namespace EcommerceDemo.Core.Services
             }
         }
 
-        public long Update(long id, ProductDto productDto)
+        private void ValidateProductDto(ProductDto productDto)
         {
             if (productDto.Category == null)
             {
-                throw new InvalidServiceCallException("Product category should be defined.");
+                throw new InvalidServiceCallException("product category should be defined.");
             }
+
+            var productCategory = _productCategoryAppServices.Get(productDto.Category.CategoryId);
+
+            if (productCategory == null)
+            {
+                throw new InvalidServiceCallException("product category does not exist.");
+            }
+
+            var attributes = _productCategoryAttributeAppServices.GetByProductCategoryId(productDto.Category.CategoryId);
+
+            if (productDto.Attributes != null
+                && productDto.Attributes.Select(x => x.AttributeId).Any(y => !attributes.Select(s => s.AttributeId).Contains(y)))
+            {
+                throw new InvalidServiceCallException("product attribute does not exist or does not belongs to selected product category");
+            }
+        }
+
+        public long Update(long id, ProductDto productDto)
+        {
+            ValidateProductDto(productDto);
 
             using (var scope = new TransactionScope())
             {
                 var product = _uow.ProductRepository.GetByID(id);
+
+                if (product == null)
+                {
+                    throw new InvalidServiceCallException("product does not exist");
+                }
+
                 product.ProdName = productDto.ProductName;
                 product.ProdDescription = productDto.ProductDescription;
                 product.ProdCatId = productDto.Category.CategoryId;
@@ -163,23 +197,23 @@ namespace EcommerceDemo.Core.Services
             {
                 var product = _uow.ProductRepository.GetByID(id);
 
-                if (product != null)
+                if (product == null)
                 {
-                    var productAttributeIds = product.ProductAttributes?.Select(x => x.ProductAttributeId).ToList() ?? new List<long>();
-
-                    foreach (var productAttributeId in productAttributeIds)
-                    {
-                        _uow.ProductAttributeRepository.Delete(productAttributeId);
-                    }
-
-                    _uow.ProductRepository.Delete(product);
-                    _uow.Save();
-                    scope.Complete();
-                    return true;
+                    throw new InvalidServiceCallException("product does not exist");
                 }
-            }
 
-            return false;
+                var productAttributeIds = product.ProductAttributes?.Select(x => x.ProductAttributeId).ToList() ?? new List<long>();
+
+                foreach (var productAttributeId in productAttributeIds)
+                {
+                    _uow.ProductAttributeRepository.Delete(productAttributeId);
+                }
+
+                _uow.ProductRepository.Delete(product);
+                _uow.Save();
+                scope.Complete();
+                return true;
+            }            
         }
 
         private ProductDto MapToDto(Product product)
